@@ -1,0 +1,27 @@
+{
+  "name": "mongoose-practice-zero-to-advanced",
+  "version": "1.0.0",
+  "description": "Comprehensive Mongoose practice project covering all concepts from basics to advanced",
+  "main": "src/server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node src/server.js",
+    "seed": "node src/seed/index.js",
+    "example:basics": "node examples/01-basics.js",
+    "example:crud": "node examples/02-crud.js",
+    "example:queries": "node examples/03-queries.js",
+    "example:middleware": "node examples/04-middleware.js",
+    "example:validation": "node examples/05-validation.js",
+    "example:populate": "node examples/06-populate.js",
+    "example:aggregation": "node examples/07-aggregation.js",
+    "example:advanced": "node examples/08-advanced.js"
+  },
+  "dependencies": {
+    "mongoose": "^9.7.3",
+    "dotenv": "^16.4.5",
+    "bcryptjs": "^2.4.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

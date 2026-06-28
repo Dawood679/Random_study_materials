@@ -1,0 +1,37 @@
+{
+  "name": "prisma-practice-zero-to-advanced",
+  "version": "1.0.0",
+  "description": "Comprehensive Prisma + Express practice project covering all concepts from basics to advanced",
+  "main": "src/server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node src/server.js",
+    "seed": "node src/seed.js",
+    "db:migrate": "npx prisma migrate dev --name init",
+    "db:push": "npx prisma db push",
+    "db:studio": "npx prisma studio",
+    "db:reset": "npx prisma migrate reset --force",
+    "db:generate": "npx prisma generate",
+    "example:basics": "node examples/01-basics.js",
+    "example:schema": "node examples/02-schema.js",
+    "example:crud": "node examples/03-crud.js",
+    "example:relations": "node examples/04-relations.js",
+    "example:queries": "node examples/05-queries.js",
+    "example:transactions": "node examples/06-transactions.js",
+    "example:middleware": "node examples/07-middleware.js",
+    "example:aggregations": "node examples/08-aggregations.js",
+    "example:raw": "node examples/09-raw-queries.js",
+    "example:advanced": "node examples/10-advanced.js"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.22.0",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.1"
+  },
+  "devDependencies": {
+    "prisma": "^5.22.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

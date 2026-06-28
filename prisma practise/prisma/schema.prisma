@@ -1,0 +1,144 @@
+// Prisma Schema — Zero to Advanced
+// Covers: all field types, enums, relations (1-1, 1-many, many-many), soft-delete, indexes
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Enums ───────────────────────────────────────────────────────────────────
+
+enum Role {
+  USER
+  ADMIN
+  MODERATOR
+}
+
+enum PostStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+// ─── Models ──────────────────────────────────────────────────────────────────
+
+// User — 1-1 Profile, 1-many Posts, 1-many Comments
+model User {
+  id        Int       @id @default(autoincrement())
+  email     String    @unique
+  username  String    @unique
+  password  String
+  role      Role      @default(USER)
+  isActive  Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?             // soft delete field
+
+  // Relations
+  profile   Profile?
+  posts     Post[]
+  comments  Comment[]
+
+  @@index([email])
+  @@index([role])
+  @@map("users")
+}
+
+// Profile — 1-1 with User
+model Profile {
+  id        Int      @id @default(autoincrement())
+  bio       String?
+  avatar    String?
+  website   String?
+  location  String?
+  birthDate DateTime?
+  meta      Json?    // JSON field example
+
+  // 1-1 relation — userId is unique
+  userId    Int      @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("profiles")
+}
+
+// Category — 1-many with Posts
+model Category {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  slug        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+
+  posts       Post[]
+
+  @@map("categories")
+}
+
+// Tag — many-many with Posts (implicit join table _PostToTag)
+model Tag {
+  id    Int    @id @default(autoincrement())
+  name  String @unique
+  color String @default("#6366f1")
+
+  posts Post[]
+
+  @@map("tags")
+}
+
+// Post — many-1 User, many-1 Category, many-many Tag, 1-many Comment
+model Post {
+  id          Int        @id @default(autoincrement())
+  title       String
+  slug        String     @unique
+  content     String
+  excerpt     String?
+  status      PostStatus @default(DRAFT)
+  viewCount   Int        @default(0)
+  publishedAt DateTime?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  deletedAt   DateTime?  // soft delete field
+
+  // Foreign keys
+  authorId    Int
+  categoryId  Int?
+
+  // Relations
+  author      User      @relation(fields: [authorId], references: [id])
+  category    Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  tags        Tag[]
+  comments    Comment[]
+
+  @@index([authorId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("posts")
+}
+
+// Comment — many-1 Post, many-1 User, self-referencing (replies)
+model Comment {
+  id        Int       @id @default(autoincrement())
+  body      String
+  likes     Int       @default(0)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  // Foreign keys
+  postId    Int
+  authorId  Int
+  parentId  Int?      // for nested replies
+
+  // Relations
+  post      Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
+  author    User      @relation(fields: [authorId], references: [id])
+  parent    Comment?  @relation("CommentReplies", fields: [parentId], references: [id])
+  replies   Comment[] @relation("CommentReplies")
+
+  @@index([postId])
+  @@index([authorId])
+  @@map("comments")
+}
