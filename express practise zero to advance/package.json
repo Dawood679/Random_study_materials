@@ -1,0 +1,40 @@
+{
+  "name": "express-practice-zero-to-advanced",
+  "version": "1.0.0",
+  "description": "Comprehensive Express.js practice project covering all concepts from basics to advanced",
+  "main": "src/server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "example:basics": "node examples/01-basics.js",
+    "example:routing": "node examples/02-routing.js",
+    "example:middleware": "node examples/03-middleware.js",
+    "example:rest-api": "node examples/04-rest-api.js",
+    "example:error-handling": "node examples/05-error-handling.js",
+    "example:validation": "node examples/06-validation.js",
+    "example:auth": "node examples/07-auth.js",
+    "example:file-upload": "node examples/08-file-upload.js",
+    "example:advanced": "node examples/09-advanced.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "cors": "^2.8.5",
+    "helmet": "^7.1.0",
+    "dotenv": "^16.4.5",
+    "jsonwebtoken": "^9.0.2",
+    "bcryptjs": "^2.4.3",
+    "express-validator": "^7.2.0",
+    "multer": "^1.4.5-lts.1",
+    "express-rate-limit": "^7.4.1",
+    "compression": "^1.7.4",
+    "morgan": "^1.10.0",
+    "cookie-parser": "^1.4.6"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.7"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
