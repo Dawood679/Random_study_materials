@@ -1,0 +1,15 @@
+version: "3.9"
+
+services:
+  app:
+    image: node:20-alpine
+    working_dir: /app
+    volumes:
+      - .:/app
+    ports:
+      - "3000:3000"
+    command: sh -c "npm install && node src/server.js"
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      JWT_SECRET: supersecretkey123
