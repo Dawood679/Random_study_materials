@@ -3,12 +3,15 @@ import connectDb from "./helper/DbConnection.js"
 import User from "./models/User.js"
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
+import auth from "./Middleware/auth.js"
+import cookieParser from "cookie-parser"
 const app = express()
 
 
 app.use(express.json())
 
-
+app.use(express.urlencoded({extended:true}))
+app.use(cookieParser())
 
 
 app.post("/login",async(req,res)=>{
@@ -35,7 +38,7 @@ app.post("/login",async(req,res)=>{
     }
 
     const accesstoken = jwt.sign({userId:user._id},process.env.JWT_SECRET || "dawoodalam",{
-        expiresIn:"1h"
+        expiresIn:"1min"
     })
 
     const refreshtoken = jwt.sign({userId:user._id},process.env.JWT_SECRET || "dawoodalam",{
@@ -54,6 +57,34 @@ app.post("/login",async(req,res)=>{
 })
 
 
+app.get("/protected",auth,(req,res)=>{
+    return res.status(200).json({message:"Protected route accessed", userId:req.userId})
+})
+
+
+app.post("/register",async(req,res)=>{
+    const {email,password} = req.body
+
+
+    if(!email || !password){
+        return res.status(400).json({message:"Email and password are required"})
+    }
+    const hashedPassword =  await bcrypt.hash(password,10)
+    const userExists = await User.findOne({email})
+    if(userExists){
+        return res.status(400).json({message:"User already exists"})
+    }
+   const createUser = await User.create({
+    email,
+    password:hashedPassword
+   })
+
+
+  return  res.json({message:"User created successfully", user:createUser})
+
+})
+
+
 app.get("/refresh",(req,res)=>{
 
     const refreshToken = req.cookies.refreshToken
@@ -64,12 +95,10 @@ app.get("/refresh",(req,res)=>{
     
     try{
         const decoded = jwt.verify(refreshToken,process.env.JWT_SECRET || "dawoodalam") 
-    }
-    catch(error){
-        return res.status(401).json({message:"Invalid refresh token"})
-    }
-
-    const newAccessToken = jwt.sign({userId:decoded.userId},process.env.JWT_SECRET || "dawoodalam",{
+        if(!decoded){
+            return res.status(401).json({message:"Invalid refresh token"})
+        }
+        const newAccessToken = jwt.sign({userId:decoded.userId},process.env.JWT_SECRET || "dawoodalam",{
         expiresIn:"1h"
     })
 
@@ -78,9 +107,16 @@ app.get("/refresh",(req,res)=>{
     const newToken = {
         accessToken:newAccessToken,
     }
+    res.clearCookie("accessToken")
 
     res.cookie("accessToken",newToken,{ httpOnly:true })
     return res.status(200).json({message:"Token refreshed successfully", token:newToken})
+    }
+    catch(error){
+        return res.status(401).json({message:"Invalid refresh token"})
+    }
+
+    
 })
 
 
